@@ -90,10 +90,6 @@
           <el-input v-model="form.title" placeholder="请输入标题"/>
         </el-form-item>
 
-        <el-form-item label="负责人" prop="gmtCreateUser">
-          <el-input v-model="form.gmtCreateUser" placeholder="请输入负责人" maxlength="20"/>
-        </el-form-item>
-
         <el-form-item label="公告状态">
           <el-radio-group v-model="form.disable">
             <el-radio :label="1">正常</el-radio>
@@ -163,10 +159,6 @@
           title: '新增公告',
           visible: true
         }
-        await this.loadDeptOptions()
-        if (row) {
-          this.form.parentId = row.id
-        }
       },
       async handleUpdate(row) {
         this.resetForm()
@@ -174,8 +166,6 @@
           title: '修改公告',
           visible: true
         }
-        // 公告下拉数据
-        await this.loadDeptOptions()
         detail(row.id).then(response => {
           this.form = response.data
         })
@@ -184,6 +174,7 @@
         this.$refs['form'].validate(valid => {
           if (valid) {
             const id = this.form.id
+            console.log(this.form)
             if (id != undefined) {
               update(id, this.form).then(() => {
                 this.$message.success('修改成功')
@@ -218,9 +209,6 @@
       resetForm() {
         this.form = {
           title: undefined,
-          gmtCreate: 1,
-          gmtCreateUser: undefined,
-          disableFlag: 1
         }
         if (this.$refs['form']) {
           this.$refs['form'].resetFields()

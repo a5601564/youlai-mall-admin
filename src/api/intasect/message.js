@@ -25,7 +25,7 @@ export function add(data) {
 
 export function update(id, data) {
   return request({
-    url: '/intasect-service/messageInfoTbl/update/' + id,
+    url: '/intasect-service/messageInfoTbl/update/',
     method: 'put',
     data: data
   })
