@@ -73,7 +73,7 @@ export default {
     size: '画面サイズ'
   },
   login: {
-    title: 'ユーザログイン',
+    title: 'WEB受発注システム',
     logIn: 'ログイン',
     username: 'ユーザ名',
     password: 'パスワード',

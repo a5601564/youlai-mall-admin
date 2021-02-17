@@ -206,7 +206,7 @@ export default {
     // 语言类型
     langType: {
       type: String,
-      default: 'zh'
+      default: 'ja'
     },
     // 语言包
     langExt: {

@@ -159,6 +159,9 @@
           title: '新增公告',
           visible: true
         }
+
+        // 跳转
+        this.$router.push('/intasect/message/list/update');
       },
       async handleUpdate(row) {
         this.resetForm()

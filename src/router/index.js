@@ -91,29 +91,6 @@ export const constantRoutes = [
       }
     ]
   },
-  {
-    path: '/intasect',
-    component: Layout,
-    redirect: '/intasect/index',
-    alwaysShow: true, // will always show the root menu
-    name: 'Intasect',
-    meta: {
-      title: 'intasect-服务',
-      icon: 'documentation',
-      roles: [ 1,2] // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'message',
-        component: () => import('@/views/intasect/message'),
-        name: 'Message',
-        meta: {
-          title: '信息一览',
-          roles: [1,2]
-        }
-      },
-    ]
-  },
 ]
 
 /**
