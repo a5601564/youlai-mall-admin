@@ -154,24 +154,16 @@
         this.handleQuery()
       },
       async handleAdd(row) {
-        this.resetForm()
-        this.dialog = {
-          title: '新增公告',
-          visible: true
-        }
-
         // 跳转
-        this.$router.push('/intasect/message/list/update');
+        this.$router.push('/intasect/message/create');
       },
       async handleUpdate(row) {
-        this.resetForm()
-        this.dialog = {
-          title: '修改公告',
-          visible: true
-        }
-        detail(row.id).then(response => {
-          this.form = response.data
-        })
+        var _json = {"id":row.id}
+        // 跳转
+        this.$router.push({
+          path: '/intasect/message/update',
+          params: _json
+        });
       },
       handleSubmit: function () {
         this.$refs['form'].validate(valid => {

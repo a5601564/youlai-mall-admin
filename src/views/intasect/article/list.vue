@@ -9,13 +9,13 @@
 
       <el-table-column width="180px" align="center" label="Date">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ scope.row.gmtCreate | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
       <el-table-column width="120px" align="center" label="Author">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.gmtCreateUser }}</span>
         </template>
       </el-table-column>
 
@@ -27,15 +27,15 @@
 
       <el-table-column class-name="status-col" label="Status" width="110">
         <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
+          <el-tag :type="row.contentType | statusFilter">
+            {{ row.contentType }}
           </el-tag>
         </template>
       </el-table-column>
 
       <el-table-column min-width="300px" label="Title">
         <template slot-scope="{row}">
-          <router-link :to="'/example/edit/'+row.id" class="link-type">
+          <router-link :to="{path: '/intasect/message/update', params: {id: row.id }}"  class="link-type">
             <span>{{ row.title }}</span>
           </router-link>
         </template>
@@ -43,7 +43,7 @@
 
       <el-table-column align="center" label="Actions" width="120">
         <template slot-scope="scope">
-          <router-link :to="'/example/edit/'+scope.row.id">
+          <router-link :to="{path: '/intasect/message/update', params: {id: scope.row.id }}" >
             <el-button type="primary" size="small" icon="el-icon-edit">
               Edit
             </el-button>
@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
+import {page as fetchPage} from '@/api/intasect/message'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 
 export default {
@@ -90,9 +90,9 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+      fetchPage(this.listQuery).then(response => {
+        this.list = response.data.rows
+        this.total = response.data.records
         this.listLoading = false
       })
     }

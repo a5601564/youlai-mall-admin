@@ -3,8 +3,6 @@
     <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
       <sticky :z-index="10" :class-name="'sub-navbar '+postForm.status">
         <CommentDropdown v-model="postForm.comment_disabled" />
-        <PlatformDropdown v-model="postForm.platforms" />
-        <SourceUrlDropdown v-model="postForm.source_uri" />
         <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">
           Publish
         </el-button>
@@ -15,8 +13,6 @@
 
       <div class="createPost-main-container">
         <el-row>
-          <Warning />
-
           <el-col :span="24">
             <el-form-item style="margin-bottom: 40px;" prop="title">
               <MDinput v-model="postForm.title" :maxlength="100" name="name" required>
@@ -26,20 +22,6 @@
 
             <div class="postInfo-container">
               <el-row>
-                <el-col :span="8">
-                  <el-form-item label-width="60px" label="Author:" class="postInfo-container-item">
-                    <el-select v-model="postForm.author" :remote-method="getRemoteUserList" filterable default-first-option remote placeholder="Search user">
-                      <el-option v-for="(item,index) in userListOptions" :key="item+index" :label="item" :value="item" />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-
-                <el-col :span="10">
-                  <el-form-item label-width="120px" label="Publish Time:" class="postInfo-container-item">
-                    <el-date-picker v-model="displayTime" type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="Select date and time" />
-                  </el-form-item>
-                </el-col>
-
                 <el-col :span="6">
                   <el-form-item label-width="90px" label="Importance:" class="postInfo-container-item">
                     <el-rate
@@ -57,14 +39,17 @@
           </el-col>
         </el-row>
 
-        <el-form-item style="margin-bottom: 40px;" label-width="70px" label="Summary:">
-          <el-input v-model="postForm.content_short" :rows="1" type="textarea" class="article-textarea" autosize placeholder="Please enter the content" />
-          <span v-show="contentShortLength" class="word-counter">{{ contentShortLength }}words</span>
+        <el-form-item prop="content" style="margin-bottom: 30px;">
+          <quill-editor 
+              v-model="postForm.content" 
+              ref="myQuillEditor" 
+              :options="editorOption" 
+              @blur="onEditorBlur($event)" @focus="onEditorFocus($event)"
+              @change="onEditorChange($event)">
+          </quill-editor>
         </el-form-item>
 
-        <el-form-item prop="content" style="margin-bottom: 30px;">
-          <Tinymce ref="editor" v-model="postForm.content" :height="400" />
-        </el-form-item>
+
 
       </div>
     </el-form>
@@ -72,32 +57,31 @@
 </template>
 
 <script>
-import Tinymce from '@/components/Tinymce'
 import MDinput from '@/components/MDinput'
 import Sticky from '@/components/Sticky' // 粘性header组件
 import { validURL } from '@/utils/validate'
-import { fetchArticle } from '@/api/article'
-import { searchUser } from '@/api/remote-search'
-import Warning from './Warning'
-import { CommentDropdown, PlatformDropdown, SourceUrlDropdown } from './Dropdown'
+import { list as searchUser } from '@/api/admin/user'
+import { CommentDropdown, SourceUrlDropdown } from './Dropdown'
+import {add as createArticle , detail as fetchArticle } from '@/api/intasect/message'
+
+import { quillEditor } from "vue-quill-editor"; //调用编辑器
+import 'quill/dist/quill.core.css';
+import 'quill/dist/quill.snow.css';
+import 'quill/dist/quill.bubble.css';
+
 
 const defaultForm = {
   status: 'draft',
   title: '', // 文章题目
   content: '', // 文章内容
-  content_short: '', // 文章摘要
-  source_uri: '', // 文章外链
-  image_uri: '', // 文章图片
-  display_time: undefined, // 前台展示时间
   id: undefined,
-  platforms: ['a-platform'],
   comment_disabled: false,
   importance: 0
 }
 
 export default {
   name: 'ArticleDetail',
-  components: { Tinymce, MDinput, Sticky, Warning, CommentDropdown, PlatformDropdown, SourceUrlDropdown },
+  components: { MDinput, Sticky, CommentDropdown, SourceUrlDropdown, quillEditor },
   props: {
     isEdit: {
       type: Boolean,
@@ -136,40 +120,28 @@ export default {
       loading: false,
       userListOptions: [],
       rules: {
-        image_uri: [{ validator: validateRequire }],
         title: [{ validator: validateRequire }],
         content: [{ validator: validateRequire }],
-        source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
       },
-      tempRoute: {}
+      tempRoute: {},
+      content: `<p></p><p><br></p><ol><li><strong><em>Or drag/paste an image here.</em></strong></li><li><strong><em>rerew</em></strong></li><li><strong><em>rtrete</em></strong></li><li><strong><em>tytrytr</em></strong></li><li><strong><em>uytu</em></strong></li></ol>`,
+      editorOption: {}
     }
   },
   computed: {
-    contentShortLength() {
-      return this.postForm.content_short.length
-    },
     lang() {
       return this.$store.getters.language
     },
-    displayTime: {
-      // set and get is useful when the data
-      // returned by the back end api is different from the front end
-      // back end return => "2013-06-25 06:59:25"
-      // front end need timestamp => 1372114765000
-      get() {
-        return (+new Date(this.postForm.display_time))
-      },
-      set(val) {
-        this.postForm.display_time = new Date(val)
-      }
-    }
+    editor() {
+      return this.$refs.myQuillEditor.quill;
+    },
   },
   created() {
+    console.log("init",this.$route.params);
     if (this.isEdit) {
       const id = this.$route.params && this.$route.params.id
       this.fetchData(id)
     }
-
     // Why need to make a copy of this.$route here?
     // Because if you enter this page and quickly switch tag, may be in the execution of the setTagsViewTitle function, this.$route is no longer pointing to the current page
     // https://github.com/PanJiaChen/vue-element-admin/issues/1221
@@ -182,7 +154,6 @@ export default {
 
         // just for test
         this.postForm.title += `   Article Id:${this.postForm.id}`
-        this.postForm.content_short += `   Article Id:${this.postForm.id}`
 
         // set tagsview title
         this.setTagsViewTitle()
@@ -213,8 +184,14 @@ export default {
             type: 'success',
             duration: 2000
           })
-          this.postForm.status = 'published'
           this.loading = false
+          console.log(this.postForm)
+          createArticle(this.postForm).then(response => {
+            console.log("result" , response.data)
+          }).catch(err => {
+            console.log(err)
+          });
+          
         } else {
           console.log('error submit!!')
           return false
@@ -242,7 +219,13 @@ export default {
         if (!response.data.items) return
         this.userListOptions = response.data.items.map(v => v.name)
       })
-    }
+    },
+    onEditorReady(editor) { // 准备编辑器
+    },
+    onEditorBlur(){}, // 失去焦点事件
+    onEditorFocus(){}, // 获得焦点事件
+    onEditorChange(){}, // 内容改变事件
+
   }
 }
 </script>
@@ -283,5 +266,9 @@ export default {
     border-radius: 0px;
     border-bottom: 1px solid #bfcbd9;
   }
+}
+
+.quill-editor{
+  height:200px;
 }
 </style>
