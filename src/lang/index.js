@@ -30,7 +30,7 @@ export function getLanguage() {
       return locale
     }
   }
-  return 'ja'
+  return 'en'
 }
 const i18n = new VueI18n({
   // set locale

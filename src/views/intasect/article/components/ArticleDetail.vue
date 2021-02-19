@@ -2,7 +2,6 @@
   <div class="createPost-container">
     <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
       <sticky :z-index="10" :class-name="'sub-navbar '+postForm.status">
-        <CommentDropdown v-model="postForm.comment_disabled" />
         <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">
           Publish
         </el-button>
@@ -68,7 +67,6 @@ import { quillEditor } from "vue-quill-editor"; //调用编辑器
 import 'quill/dist/quill.core.css';
 import 'quill/dist/quill.snow.css';
 import 'quill/dist/quill.bubble.css';
-
 
 const defaultForm = {
   status: 'draft',
@@ -137,9 +135,10 @@ export default {
     },
   },
   created() {
-    console.log("init",this.$route.params);
+    console.log("init",this.$route);
+    console.log("init",this.$route.query);
     if (this.isEdit) {
-      const id = this.$route.params && this.$route.params.id
+      const id = this.$route.query && this.$route.query.id
       this.fetchData(id)
     }
     // Why need to make a copy of this.$route here?
@@ -151,9 +150,6 @@ export default {
     fetchData(id) {
       fetchArticle(id).then(response => {
         this.postForm = response.data
-
-        // just for test
-        this.postForm.title += `   Article Id:${this.postForm.id}`
 
         // set tagsview title
         this.setTagsViewTitle()
@@ -174,7 +170,7 @@ export default {
       document.title = `${title} - ${this.postForm.id}`
     },
     submitForm() {
-      console.log(this.postForm)
+      console.log(this.postForm)  
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
