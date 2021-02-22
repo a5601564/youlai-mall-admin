@@ -39,10 +39,10 @@
         </el-row>
 
         <el-form-item prop="content" style="margin-bottom: 30px;">
-          <quill-editor 
-              v-model="postForm.content" 
-              ref="myQuillEditor" 
-              :options="editorOption" 
+          <quill-editor
+              v-model="postForm.content"
+              ref="myQuillEditor"
+              :options="editorOption"
               @blur="onEditorBlur($event)" @focus="onEditorFocus($event)"
               @change="onEditorChange($event)">
           </quill-editor>
@@ -59,8 +59,6 @@
 import MDinput from '@/components/MDinput'
 import Sticky from '@/components/Sticky' // 粘性header组件
 import { validURL } from '@/utils/validate'
-import { list as searchUser } from '@/api/admin/user'
-import { CommentDropdown, SourceUrlDropdown } from './Dropdown'
 import {add as createArticle , detail as fetchArticle } from '@/api/intasect/message'
 
 import { quillEditor } from "vue-quill-editor"; //调用编辑器
@@ -79,7 +77,7 @@ const defaultForm = {
 
 export default {
   name: 'ArticleDetail',
-  components: { MDinput, Sticky, CommentDropdown, SourceUrlDropdown, quillEditor },
+  components: { MDinput, Sticky, quillEditor },
   props: {
     isEdit: {
       type: Boolean,
@@ -170,24 +168,23 @@ export default {
       document.title = `${title} - ${this.postForm.id}`
     },
     submitForm() {
-      console.log(this.postForm)  
+      console.log(this.postForm)
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$notify({
-            title: '成功',
-            message: '发布文章成功',
-            type: 'success',
-            duration: 2000
-          })
-          this.loading = false
           console.log(this.postForm)
           createArticle(this.postForm).then(response => {
-            console.log("result" , response.data)
+            this.$notify({
+              title: '成功',
+              message: '发布文章成功',
+              type: 'success',
+              duration: 2000
+            })
+            this.loading = false
           }).catch(err => {
             console.log(err)
           });
-          
+
         } else {
           console.log('error submit!!')
           return false
@@ -202,19 +199,21 @@ export default {
         })
         return
       }
-      this.$message({
-        message: '保存成功',
-        type: 'success',
-        showClose: true,
-        duration: 1000
-      })
+
+      createArticle(this.postForm).then(response => {
+            
+            this.$message({
+              message: '保存成功',
+              type: 'success',
+              showClose: true,
+              duration: 1000
+            })
+        this.loading = false
+      }).catch(err => {
+        console.log(err)
+      });
+
       this.postForm.status = 'draft'
-    },
-    getRemoteUserList(query) {
-      searchUser(query).then(response => {
-        if (!response.data.items) return
-        this.userListOptions = response.data.items.map(v => v.name)
-      })
     },
     onEditorReady(editor) { // 准备编辑器
     },
