@@ -3,7 +3,7 @@ import request from '@/utils/request'
 export function login(data) {
   return request({
     // url: '/vue-element-admin/user/login',
-    url: '/youlai-auth/oauth/token',
+    url: '/youlai-admin/oauth/token',
     method: 'post',
     params: data
   })
@@ -19,7 +19,7 @@ export function getInfo() {
 
 export function logout() {
   return request({
-    url: '/youlai-auth/oauth/logout',
+    url: '/youlai-admin/oauth/logout',
     method: 'delete'
   })
 }
