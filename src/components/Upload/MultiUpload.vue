@@ -38,7 +38,7 @@
     data() {
       return {
         headers: {authorization: 'Bearer ' + getToken()},
-        uploadAction: process.env.VUE_APP_BASE_API + '/intasect-service/api/v1/files',
+        uploadAction: process.env.VUE_APP_BASE_API + '/api/v1/files',
         dialogVisible: false,
         dialogImageUrl: null,
       };
