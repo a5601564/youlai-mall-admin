@@ -40,7 +40,7 @@ const actions = {
         username: username,
         password: password,
         grant_type: 'password',
-        client_id: 'intasect-service',
+        client_id: 'youlai-admin',
         client_secret: '123456'
       }).then(response => {
         const {token, refreshToken} = response.data
@@ -59,7 +59,7 @@ const actions = {
       login({
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
-        client_id: 'intasect-service',
+        client_id: 'youlai-admin',
         client_secret: '123456'
       }).then(response => {
         const {token, refreshToken} = response.data
