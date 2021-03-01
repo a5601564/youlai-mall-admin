@@ -141,7 +141,6 @@
 </template>
 
 <script>
-  import {list, detail, update, add, del} from '@/api/admin/dept'
   import TreeSelect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 

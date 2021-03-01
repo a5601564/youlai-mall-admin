@@ -119,15 +119,6 @@ export const asyncRoutes = [
           roles: [1,2]
         }
       },
-      {
-        path: 'dept',
-        component: () => import('@/views/admin/dept'),
-        name: 'Dept',
-        meta: {
-          title: '部门管理',
-          roles: [1]
-        }
-      },
     ]
   },
   // 404 page must be placed at the end !!!
