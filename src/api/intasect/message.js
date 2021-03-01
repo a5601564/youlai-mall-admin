@@ -10,7 +10,7 @@ export function list(queryParams) {
 
 export function page(queryParams) {
   return request({
-    url: '/intasect-service/messageInfoTbl/page',
+    url: '/messageInfoTbl/page',
     method: 'get',
     params: queryParams
   })
